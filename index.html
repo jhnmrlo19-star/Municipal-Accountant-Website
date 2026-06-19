@@ -491,6 +491,13 @@ updateFrontendActivities();
 // Show Admin Dashboard
 function showAdminDashboard(event) {
     event.preventDefault();
+
+    let password = prompt("Enter Admin Password:");
+
+    if(password !== "admin123"){
+        alert("Incorrect password");
+        return;
+    }
     loadActivities();
     loadInquiries();
     document.getElementById('adminModal').classList.remove('hidden');
