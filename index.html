@@ -530,7 +530,6 @@ function saveActivity(event) {
     const description = document.getElementById('activityDescription').value;
     const image = document.getElementById('activityImage').value || 'https://images.unsplash.com/photo-1552664730-d307ca884978';
     
-    import { ref, set } from "firebase/database";
 
 set(ref(database, 'activities/' + id), {
         id,
