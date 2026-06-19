@@ -23,7 +23,7 @@ const SITE_CONFIG = {
 
   // ── Admin Access ───────────────────────────────────────────
   // Change this password before going live!
-  adminPassword: "admin123",
+  adminPassword: "@ccounting2026",
 
   // ── Site Identity ──────────────────────────────────────────
   site: {
@@ -54,9 +54,9 @@ in public financial management.`,
     address: "Santo Domingo Municipal Hall Building",
     city: "Municipality of Santo Domingo, Nueva Ecija",
     email: "sdne.maiaso@gmail.com",
-    phone: "(044) 123-4567",
+    phone: "09*********",
     hours: "Monday – Friday, 8:00 AM – 5:00 PM",
-    mapEmbed: "", // Optional: paste Google Maps embed URL here
+    mapEmbed: "", // https://maps.app.goo.gl/guzSZdkYes3B28En8
   },
 
   // ── Navigation Links ───────────────────────────────────────
