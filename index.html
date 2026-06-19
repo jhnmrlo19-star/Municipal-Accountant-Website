@@ -1,709 +1,302 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Office of the Municipal Accountant</title>
-<style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-body{
-    font-family:"Times New Roman", serif;
-    background:#f4f6f9;
-    color:#333;
-}
-header{
-    background:#003366;
-    color:white;
-    padding:20px 50px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-header h1{
-    font-size:28px;
-}
-nav a{
-    color:white;
-    text-decoration:none;
-    margin-left:20px;
-    font-size:18px;
-}
-nav a.admin-btn{
-    background:#00509e;
-    padding:8px 15px;
-    border-radius:5px;
-    font-size:16px;
-}
-nav a.admin-btn:hover{
-    background:#003d7a;
-}
-.hero{
-    background:linear-gradient(rgba(0,51,102,0.7),rgba(0,51,102,0.7)),
-    url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40');
-    background-size:cover;
-    background-position:center;
-    color:white;
-    text-align:center;
-    padding:120px 20px;
-}
-.hero h2{
-    font-size:48px;
-    margin-bottom:15px;
-}
-.hero p{
-    font-size:22px;
-}
-.container{
-    width:90%;
-    max-width:1200px;
-    margin:auto;
-    padding:50px 0;
-}
-.section-title{
-    text-align:center;
-    color:#003366;
-    margin-bottom:30px;
-    font-size:36px;
-}
-.about{
-    background:white;
-    padding:40px;
-    border-radius:10px;
-    box-shadow:0 3px 10px rgba(0,0,0,0.1);
-}
-.activities{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-    gap:20px;
-}
-.card{
-    background:white;
-    border-radius:10px;
-    overflow:hidden;
-    box-shadow:0 3px 10px rgba(0,0,0,0.1);
-}
-.card img{
-    width:100%;
-    height:220px;
-    object-fit:cover;
-}
-.card-content{
-    padding:20px;
-}
-.card-content h3{
-    color:#003366;
-    margin-bottom:10px;
-}
-.form-container{
-    background:white;
-    padding:40px;
-    border-radius:10px;
-    box-shadow:0 3px 10px rgba(0,0,0,0.1);
-}
-form input,
-form textarea{
-    width:100%;
-    padding:12px;
-    margin-bottom:15px;
-    border:1px solid #ccc;
-    border-radius:5px;
-    font-family:"Times New Roman", serif;
-}
-form button{
-    background:#003366;
-    color:white;
-    border:none;
-    padding:12px 25px;
-    border-radius:5px;
-    cursor:pointer;
-    font-size:18px;
-}
-form button:hover{
-    background:#00509e;
-}
-.contact{
-    text-align:center;
-    line-height:2;
-}
-footer{
-    background:#003366;
-    color:white;
-    text-align:center;
-    padding:20px;
-    margin-top:50px;
-}
-.hidden{
-    display:none !important;
-}
-.modal{
-    position:fixed;
-    top:0;
-    left:0;
-    right:0;
-    bottom:0;
-    background:rgba(0,0,0,0.7);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    z-index:1000;
-}
-.modal-content{
-    background:white;
-    padding:30px;
-    border-radius:10px;
-    max-width:500px;
-    width:90%;
-    max-height:80vh;
-    overflow-y:auto;
-}
-.modal-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:20px;
-}
-.close-btn{
-    background:none;
-    border:none;
-    font-size:24px;
-    cursor:pointer;
-    color:#666;
-}
-.admin-dashboard{
-    background:white;
-    padding:30px;
-    border-radius:10px;
-    box-shadow:0 3px 10px rgba(0,0,0,0.1);
-}
-.dashboard-section{
-    margin-bottom:40px;
-}
-.dashboard-section h3{
-    color:#003366;
-    margin-bottom:20px;
-    font-size:24px;
-    border-bottom:2px solid #003366;
-    padding-bottom:10px;
-}
-.inquiry-item{
-    background:#f9f9f9;
-    padding:15px;
-    margin-bottom:15px;
-    border-left:4px solid #003366;
-    border-radius:5px;
-}
-.inquiry-item .inquiry-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:10px;
-}
-.inquiry-item .inquiry-name{
-    font-weight:bold;
-    color:#003366;
-}
-.inquiry-item .inquiry-email{
-    color:#666;
-    font-size:14px;
-}
-.inquiry-item .inquiry-subject{
-    font-weight:bold;
-    margin-top:10px;
-}
-.inquiry-item .inquiry-message{
-    margin-top:10px;
-    color:#333;
-    line-height:1.6;
-}
-.inquiry-item .inquiry-date{
-    font-size:12px;
-    color:#999;
-    margin-top:10px;
-}
-.action-buttons{
-    display:flex;
-    gap:10px;
-    margin-top:10px;
-}
-.action-buttons button{
-    padding:6px 12px;
-    border:none;
-    border-radius:5px;
-    cursor:pointer;
-    font-size:14px;
-}
-.delete-btn{
-    background:#e74c3c;
-    color:white;
-}
-.delete-btn:hover{
-    background:#c0392b;
-}
-.add-activity-btn{
-    background:#003366;
-    color:white;
-    padding:12px 25px;
-    border:none;
-    border-radius:5px;
-    cursor:pointer;
-    font-size:16px;
-    margin-bottom:20px;
-}
-.add-activity-btn:hover{
-    background:#00509e;
-}
-.admin-activities-list{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-    gap:20px;
-}
-.admin-activity-card{
-    background:#f9f9f9;
-    padding:20px;
-    border-radius:10px;
-    border:1px solid #ddd;
-}
-.admin-activity-card h4{
-    color:#003366;
-    margin-bottom:10px;
-}
-.admin-activity-card p{
-    margin-bottom:10px;
-    line-height:1.6;
-}
-.admin-activity-card .action-buttons{
-    margin-top:15px;
-}
-.edit-btn{
-    background:#3498db;
-    color:white;
-}
-.edit-btn:hover{
-    background:#2980b9;
-}
-form.admin-form input,
-form.admin-form textarea{
-    width:100%;
-    padding:12px;
-    margin-bottom:15px;
-    border:1px solid #ccc;
-    border-radius:5px;
-    font-family:"Times New Roman", serif;
-    font-size:14px;
-}
-form.admin-form button{
-    background:#003366;
-    color:white;
-    border:none;
-    padding:12px 25px;
-    border-radius:5px;
-    cursor:pointer;
-    font-size:16px;
-}
-form.admin-form button:hover{
-    background:#00509e;
-}
-@media(max-width:768px){
-.hero h2{
-    font-size:32px;
-}
-header{
-    flex-direction:column;
-    align-items:flex-start;
-}
-nav a{
-    margin-left:0;
-    margin-right:10px;
-}
-}
-</style>
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Official website of the Office of the Municipal Accountant — transparency, accountability, and public service.">
+  <title>Office of the Municipal Accountant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-<header>
-    <h1>Office of the Municipal Accountant</h1>
-    <nav>
-        <a href="#about">About</a>
-        <a href="#activities">Activities</a>
-        <a href="#inquiry">Inquiry</a>
-        <a href="#contact">Contact</a>
-        <a href="#" class="admin-btn" onclick="showAdminDashboard(event)">Admin</a>
-    </nav>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-inner">
+    <a href="#" class="logo">
+      <div class="logo-icon" id="logoIcon">MA</div>
+      <span class="logo-text" id="logoText">Office of the Municipal Accountant</span>
+    </a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">☰</button>
+    <nav class="nav" id="mainNav"></nav>
+  </div>
 </header>
+
+<!-- Hero -->
 <section class="hero">
-    <h2>Transparency, Accountability & Service</h2>
-    <p>Official Website of the Office of the Municipal Accountant</p>
-</section>
-<section class="container" id="about">
-    <h2 class="section-title">About the Office</h2>
-    <div class="about">
-        <p>
-            The Office of the Municipal Accountant is responsible for maintaining
-            financial records, preparing financial statements, ensuring compliance
-            with government accounting standards, and promoting transparency and
-            accountability in public financial management.
-        </p>
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <span class="hero-badge">Government of the Philippines</span>
+    <h1 id="heroTagline">Transparency, Accountability & Service</h1>
+    <p id="heroSubtitle">Official Website of the Office of the Municipal Accountant</p>
+    <div class="hero-actions">
+      <a href="#updates" class="btn btn-primary">View Updates</a>
+      <a href="#inquiry" class="btn btn-outline">Send Inquiry</a>
     </div>
-</section>
-<section class="container" id="activities">
-    <h2 class="section-title">Activities & Updates</h2>
-    <div class="activities">
-        <div class="card">
-            <img src="https://images.unsplash.com/photo-1521791136064-7986c2920216" alt="">
-            <div class="card-content">
-                <h3>Financial Management Seminar</h3>
-                <p>
-                    Staff attended a financial management seminar to enhance
-                    government accounting practices.
-                </p>
-            </div>
-        </div>
-        <div class="card">
-            <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952" alt="">
-            <div class="card-content">
-                <h3>Budget Review Meeting</h3>
-                <p>
-                    Regular budget review conducted to ensure proper allocation
-                    of municipal funds.
-                </p>
-            </div>
-        </div>
-        <div class="card">
-            <img src="https://images.unsplash.com/photo-1552664730-d307ca884978" alt="">
-            <div class="card-content">
-                <h3>COA Compliance Update</h3>
-                <p>
-                    Continuous compliance and reporting initiatives for
-                    accountability and transparency.
-                </p>
-            </div>
-        </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-number" id="statPosts">0</div>
+        <div class="stat-label">Published Updates</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" id="statInquiries">0</div>
+        <div class="stat-label">Citizen Inquiries</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">100%</div>
+        <div class="stat-label">Commitment to Service</div>
+      </div>
     </div>
+  </div>
 </section>
-<section class="container" id="inquiry">
-    <h2 class="section-title">Message & Inquiries</h2>
-    <div class="form-container">
+
+<!-- About -->
+<section class="section section-alt" id="about">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-label">Who We Are</span>
+      <h2 class="section-title" id="aboutHeading">About the Office</h2>
+    </div>
+    <div class="about-grid">
+      <div class="about-card reveal">
+        <div class="about-icon">🏛️</div>
+        <h3>Our Role</h3>
+        <p id="aboutContent"></p>
+      </div>
+      <div class="about-card reveal">
+        <div class="about-icon">🎯</div>
+        <h3>Mission</h3>
+        <p id="aboutMission"></p>
+      </div>
+      <div class="about-card reveal" style="grid-column: 1 / -1;">
+        <div class="about-icon">🔭</div>
+        <h3>Vision</h3>
+        <p id="aboutVision"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Updates / Posts -->
+<section class="section" id="updates">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-label">Latest News</span>
+      <h2 class="section-title">Updates & Announcements</h2>
+      <p class="section-desc">Stay informed with the latest activities, reports, and announcements from our office.</p>
+    </div>
+    <div class="updates-toolbar reveal">
+      <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="all">All</button>
+        <button class="filter-tab" data-filter="Announcement">Announcements</button>
+        <button class="filter-tab" data-filter="Activity">Activities</button>
+        <button class="filter-tab" data-filter="Report">Reports</button>
+        <button class="filter-tab" data-filter="Update">Updates</button>
+      </div>
+    </div>
+    <div class="posts-grid" id="postsGrid">
+      <div class="spinner"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Services -->
+<section class="section section-alt" id="services">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-label">What We Do</span>
+      <h2 class="section-title">Our Services</h2>
+      <p class="section-desc">Core functions of the Office of the Municipal Accountant in serving the public.</p>
+    </div>
+    <div class="services-grid" id="servicesGrid"></div>
+  </div>
+</section>
+
+<!-- Inquiry -->
+<section class="section" id="inquiry">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-label">Get in Touch</span>
+      <h2 class="section-title">Message & Inquiries</h2>
+      <p class="section-desc">Have a question or concern? Send us a message and we will respond as soon as possible.</p>
+    </div>
+    <div class="inquiry-grid">
+      <div class="inquiry-info reveal">
+        <h3>We Are Here to Help</h3>
+        <p>Whether you have questions about financial reports, budget allocations, or general accounting matters, our team is ready to assist you.</p>
+        <ul class="inquiry-features">
+          <li>Financial report inquiries</li>
+          <li>Budget and fund allocation questions</li>
+          <li>COA compliance information</li>
+          <li>General accounting concerns</li>
+        </ul>
+      </div>
+      <div class="form-card reveal">
         <form id="inquiryForm">
-            <input type="text" id="inquiryName" placeholder="Full Name" required>
-            <input type="email" id="inquiryEmail" placeholder="Email Address" required>
-            <input type="text" id="inquirySubject" placeholder="Subject" required>
-            <textarea id="inquiryMessage" rows="6" placeholder="Type your inquiry here..." required></textarea>
-            <button type="submit">Send Inquiry</button>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="inquiryName">Full Name</label>
+              <input type="text" id="inquiryName" placeholder="Juan Dela Cruz" required>
+            </div>
+            <div class="form-group">
+              <label for="inquiryEmail">Email Address</label>
+              <input type="email" id="inquiryEmail" placeholder="you@email.com" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inquirySubject">Subject</label>
+            <input type="text" id="inquirySubject" placeholder="What is your inquiry about?" required>
+          </div>
+          <div class="form-group">
+            <label for="inquiryMessage">Message</label>
+            <textarea id="inquiryMessage" rows="5" placeholder="Type your message here..." required></textarea>
+          </div>
+          <button type="submit" class="form-submit" id="inquirySubmit">Send Inquiry</button>
         </form>
+      </div>
     </div>
+  </div>
 </section>
-<section class="container" id="contact">
-    <h2 class="section-title">Contact Information</h2>
-    <div class="contact">
-        <p><strong>Office of the Municipal Accountant</strong></p>
-        <p>Santo Domingo Municipal Hall Building</p>
-        <p>Municipality of Santo Domingo, Nueva Ecija</p>
-        <p>Email: sdne.maiaso@gmail.com</p>
-        <p>Phone: (044) 123-4567</p>
+
+<!-- Contact -->
+<section class="section section-alt" id="contact">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-label">Reach Us</span>
+      <h2 class="section-title">Contact Information</h2>
     </div>
+    <div class="contact-grid" id="contactGrid"></div>
+  </div>
 </section>
-<footer>
-    <p>© 2026 Office of the Municipal Accountant. All Rights Reserved.</p>
+
+<!-- Footer -->
+<footer class="footer">
+  <p class="footer-brand" id="footerBrand"></p>
+  <p id="footerText"></p>
 </footer>
 
+<!-- Post Detail Modal -->
+<div id="postDetailModal" class="modal-overlay hidden">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h2 id="postDetailTitle">Post Title</h2>
+      <button class="modal-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <img class="post-detail-image" id="postDetailImage" src="" alt="">
+      <div class="post-detail-meta">
+        <span class="post-category" id="postDetailCategory"></span>
+        <span class="post-date" id="postDetailDate"></span>
+      </div>
+      <div class="post-detail-content" id="postDetailContent"></div>
+    </div>
+  </div>
+</div>
+
 <!-- Admin Dashboard Modal -->
-<div id="adminModal" class="modal hidden">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Admin Dashboard</h2>
-            <button class="close-btn" onclick="closeAdminDashboard()">&times;</button>
-        </div>
-        <div class="admin-dashboard">
-            <!-- Activities Management Section -->
-            <div class="dashboard-section">
-                <h3>Manage Activities</h3>
-                <button class="add-activity-btn" onclick="showAddActivityModal()">+ Add New Activity</button>
-                <div id="activitiesList" class="admin-activities-list">
-                    <!-- Activities will be populated here -->
-                </div>
-            </div>
-
-            <!-- Inquiries Management Section -->
-            <div class="dashboard-section">
-                <h3>Citizen Inquiries</h3>
-                <div id="inquiriesList">
-                    <!-- Inquiries will be populated here -->
-                </div>
-            </div>
-        </div>
+<div id="adminModal" class="modal-overlay hidden">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h2>Admin Dashboard</h2>
+      <button class="modal-close" aria-label="Close">&times;</button>
     </div>
+    <div class="admin-tabs">
+      <button class="admin-tab active" data-tab="posts">Posts & Updates</button>
+      <button class="admin-tab" data-tab="inquiries">Inquiries</button>
+      <button class="admin-tab" data-tab="settings">Settings Guide</button>
+    </div>
+
+    <!-- Posts Panel -->
+    <div class="admin-panel active" id="panel-posts">
+      <div class="admin-toolbar">
+        <p style="color:var(--text-muted);font-size:14px;">Manage published updates and announcements.</p>
+        <button class="btn-add" id="addPostBtn">+ Add New Post</button>
+      </div>
+      <div class="admin-list" id="adminPostsList"></div>
+    </div>
+
+    <!-- Inquiries Panel -->
+    <div class="admin-panel" id="panel-inquiries">
+      <div class="admin-toolbar">
+        <p style="color:var(--text-muted);font-size:14px;">View and manage citizen inquiries.</p>
+      </div>
+      <div class="admin-list" id="adminInquiriesList"></div>
+    </div>
+
+    <!-- Settings Guide Panel -->
+    <div class="admin-panel" id="panel-settings">
+      <div style="color:var(--text-muted);font-size:14px;line-height:1.8;">
+        <h3 style="color:var(--primary);margin-bottom:12px;">How to Edit This Website</h3>
+        <p><strong>config.js</strong> — Edit site title, contact info, about text, services, Firebase credentials, and admin password.</p>
+        <p style="margin-top:12px;"><strong>Admin Dashboard</strong> — Add, edit, or delete posts and view inquiries (no code needed).</p>
+        <p style="margin-top:12px;"><strong>css/styles.css</strong> — Customize colors and visual styling.</p>
+        <hr style="margin:20px 0;border:none;border-top:1px solid var(--border);">
+        <h3 style="color:var(--primary);margin-bottom:12px;">Firebase Setup</h3>
+        <ol style="padding-left:20px;">
+          <li>Open <a href="https://console.firebase.google.com" target="_blank" style="color:var(--primary-light);">Firebase Console</a></li>
+          <li>Create or select your project</li>
+          <li>Enable <strong>Realtime Database</strong></li>
+          <li>Copy your config values into <strong>config.js</strong></li>
+          <li>Set database rules to allow read/write (for development):<br>
+            <code style="display:block;background:var(--surface-alt);padding:10px;border-radius:8px;margin-top:8px;font-size:12px;">{ "rules": { ".read": true, ".write": true } }</code>
+          </li>
+        </ol>
+        <p style="margin-top:16px;color:var(--danger);font-size:13px;"><strong>Important:</strong> Change the default admin password in config.js before going live!</p>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- Add/Edit Activity Modal -->
-<div id="activityModal" class="modal hidden">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 id="activityModalTitle">Add New Activity</h2>
-            <button class="close-btn" onclick="closeActivityModal()">&times;</button>
-        </div>
-        <form id="activityForm" class="admin-form" onsubmit="saveActivity(event)">
-            <input type="hidden" id="activityId">
-            <input type="text" id="activityTitle" placeholder="Activity Title" required>
-            <textarea id="activityDescription" rows="4" placeholder="Activity Description" required></textarea>
-            <input type="text" id="activityImage" placeholder="Image URL (optional)">
-            <button type="submit">Save Activity</button>
-        </form>
+<!-- Add/Edit Post Modal -->
+<div id="postFormModal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="postFormTitle">Add New Post</h2>
+      <button class="modal-close" aria-label="Close">&times;</button>
     </div>
+    <div class="modal-body">
+      <form id="postForm">
+        <div class="form-group">
+          <label for="postTitle">Title</label>
+          <input type="text" id="postTitle" placeholder="Post title" required>
+        </div>
+        <div class="form-group">
+          <label for="postCategory">Category</label>
+          <select id="postCategory">
+            <option value="Update">Update</option>
+            <option value="Announcement">Announcement</option>
+            <option value="Activity">Activity</option>
+            <option value="Report">Report</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="postDescription">Short Description</label>
+          <textarea id="postDescription" rows="3" placeholder="Brief summary shown on the card" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="postFullContent">Full Content (optional)</label>
+          <textarea id="postFullContent" rows="5" placeholder="Complete details shown when clicking Read More"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="postImage">Image URL (optional)</label>
+          <input type="url" id="postImage" placeholder="https://example.com/image.jpg">
+        </div>
+        <button type="submit" class="form-submit">Save Post</button>
+      </form>
+    </div>
+  </div>
 </div>
 
-<script>
-// Global variables
-// Wait for Firebase SDK to load
-function initializeApp() {
-    if (typeof firebase === 'undefined') {
-        setTimeout(initializeApp, 100);
-        return;
-    }
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
 
-// Firebase Configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyBqfXwkM3BSJfJN5SQuQg2SxlXbLDJP2Cw",
-  authDomain: "municipal-accountant.firebaseapp.com",
-  databaseURL: "https://municipal-accountant-default-rtdb.firebaseio.com",
-  projectId: "municipal-accountant",
-  storageBucket: "municipal-accountant.firebasestorage.app",
-  messagingSenderId: "976763117968",
-  appId: "1:976763117968:web:72d44e19053923fe3c9315",
-};
-
-// Initialize Firebase
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
-
-database = firebase.database();
-updateFrontendActivities();
-}
-
-// Show Admin Dashboard
-function showAdminDashboard(event) {
-    event.preventDefault();
-
-    let password = prompt("Enter Admin Password:");
-
-    if(password !== "admin123"){
-        alert("Incorrect password");
-        return;
-    }
-    loadActivities();
-    loadInquiries();
-    document.getElementById('adminModal').classList.remove('hidden');
-}
-
-// Close Admin Dashboard
-function closeAdminDashboard() {
-    document.getElementById('adminModal').classList.add('hidden');
-}
-
-// Show Add Activity Modal
-function showAddActivityModal() {
-    document.getElementById('activityId').value = '';
-    document.getElementById('activityTitle').value = '';
-    document.getElementById('activityDescription').value = '';
-    document.getElementById('activityImage').value = '';
-    document.getElementById('activityModalTitle').textContent = 'Add New Activity';
-    document.getElementById('activityModal').classList.remove('hidden');
-}
-
-// Close Activity Modal
-function closeActivityModal() {
-    document.getElementById('activityModal').classList.add('hidden');
-}
-
-// Save Activity to Firebase
-function saveActivity(event) {
-    event.preventDefault();
-    
-    const id = document.getElementById('activityId').value || Date.now().toString();
-    const title = document.getElementById('activityTitle').value;
-    const description = document.getElementById('activityDescription').value;
-    const image = document.getElementById('activityImage').value || 'https://images.unsplash.com/photo-1552664730-d307ca884978';
-    
-
-set(ref(database, 'activities/' + id), {
-        id,
-        title,
-        description,
-        image,
-        timestamp: new Date().toISOString()
-    }).then(() => {
-        closeActivityModal();
-        loadActivities();
-        updateFrontendActivities();
-    }).catch(error => alert('Error saving activity: ' + error.message));
-}
-
-// Load Activities in Admin Dashboard
-function loadActivities() {
-    if (!database) {
-        setTimeout(loadActivities, 100);
-        return;
-    }
-    const list = document.getElementById('activitiesList');
-    list.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999;">Loading...</p>';
-    
-    database.ref('activities').on('value', (snapshot) => {
-        const data = snapshot.val();
-        const activities = data ? Object.values(data) : [];
-        
-        if (activities.length === 0) {
-            list.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999;">No activities yet. Click "Add New Activity" to create one.</p>';
-            return;
-        }
-        
-        list.innerHTML = activities.map(activity => `
-            <div class="admin-activity-card">
-                <h4>${activity.title}</h4>
-                <p>${activity.description}</p>
-                <div class="action-buttons">
-                    <button class="edit-btn" onclick="editActivity('${activity.id}')">Edit</button>
-                    <button class="delete-btn" onclick="deleteActivity('${activity.id}')">Delete</button>
-                </div>
-            </div>
-        `).join('');
-    });
-}
-
-// Edit Activity
-function editActivity(id) {
-    database.ref('activities/' + id).once('value', (snapshot) => {
-        const activity = snapshot.val();
-        if (activity) {
-            document.getElementById('activityId').value = activity.id;
-            document.getElementById('activityTitle').value = activity.title;
-            document.getElementById('activityDescription').value = activity.description;
-            document.getElementById('activityImage').value = activity.image;
-            document.getElementById('activityModalTitle').textContent = 'Edit Activity';
-            document.getElementById('activityModal').classList.remove('hidden');
-        }
-    });
-}
-
-// Delete Activity
-function deleteActivity(id) {
-    if (confirm('Are you sure you want to delete this activity?')) {
-        database.ref('activities/' + id).remove()
-            .then(() => {
-                loadActivities();
-                updateFrontendActivities();
-            })
-            .catch(error => alert('Error deleting activity: ' + error.message));
-    }
-}
-
-// Load Inquiries in Admin Dashboard
-function loadInquiries() {
-    const list = document.getElementById('inquiriesList');
-    list.innerHTML = '<p style="text-align: center; color: #999;">Loading...</p>';
-    
-    database.ref('inquiries').on('value', (snapshot) => {
-        const data = snapshot.val();
-        const inquiries = data ? Object.values(data) : [];
-        
-        if (inquiries.length === 0) {
-            list.innerHTML = '<p style="text-align: center; color: #999;">No inquiries yet.</p>';
-            return;
-        }
-        
-        list.innerHTML = inquiries.map((inquiry, index) => `
-            <div class="inquiry-item">
-                <div class="inquiry-header">
-                    <span class="inquiry-name">${inquiry.name}</span>
-                    <button class="delete-btn" onclick="deleteInquiry('${inquiry.id}')" style="padding: 4px 8px; font-size: 12px;">Delete</button>
-                </div>
-                <div class="inquiry-email">${inquiry.email}</div>
-                <div class="inquiry-subject"><strong>Subject:</strong> ${inquiry.subject}</div>
-                <div class="inquiry-message"><strong>Message:</strong> ${inquiry.message}</div>
-                <div class="inquiry-date">Received: ${new Date(inquiry.date).toLocaleString()}</div>
-            </div>
-        `).join('');
-    });
-}
-
-// Delete Inquiry
-function deleteInquiry(id) {
-    if (confirm('Delete this inquiry?')) {
-        database.ref('inquiries/' + id).remove()
-            .catch(error => alert('Error deleting inquiry: ' + error.message));
-    }
-}
-
-// Update Frontend Activities Display
-function updateFrontendActivities() {
-    const activitiesContainer = document.querySelector('.activities');
-    
-    database.ref('activities').on('value', (snapshot) => {
-        const data = snapshot.val();
-        const activities = data ? Object.values(data) : [];
-        
-        if (activitiesContainer) {
-            if (activities.length === 0) {
-                activitiesContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999;">No activities posted yet.</p>';
-            } else {
-                activitiesContainer.innerHTML = activities.map(activity => `
-                    <div class="card">
-                        <img src="${activity.image}" alt="${activity.title}">
-                        <div class="card-content">
-                            <h3>${activity.title}</h3>
-                            <p>${activity.description}</p>
-                        </div>
-                    </div>
-                `).join('');
-            }
-        }
-    });
-}
-
-// Handle Inquiry Form Submission
-document.addEventListener('DOMContentLoaded', function() {
-    initializeApp();
-    
-    const inquiryForm = document.getElementById('inquiryForm');
-    if (inquiryForm) {
-        inquiryForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            
-            const inquiryId = Date.now().toString();
-            const inquiry = {
-                id: inquiryId,
-                name: document.getElementById('inquiryName').value,
-                email: document.getElementById('inquiryEmail').value,
-                subject: document.getElementById('inquirySubject').value,
-                message: document.getElementById('inquiryMessage').value,
-                date: new Date().toISOString()
-            };
-            
-            database.ref('inquiries/' + inquiryId).set(inquiry)
-                .then(() => {
-                    alert('Thank you! Your inquiry has been received. We will get back to you soon.');
-                    inquiryForm.reset();
-                })
-                .catch(error => alert('Error submitting inquiry: ' + error.message));
-        });
-    }
-});
-
-// Close modals when clicking outside
-window.addEventListener('click', function(event) {
-    const adminModal = document.getElementById('adminModal');
-    const activityModal = document.getElementById('activityModal');
-    
-    if (event.target === adminModal) {
-        closeAdminDashboard();
-    }
-    if (event.target === activityModal) {
-        closeActivityModal();
-    }
-});
-</script>
+<!-- Scripts: config → Firebase → app -->
+<script src="config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
