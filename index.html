@@ -321,6 +321,9 @@ nav a{
 }
 }
 </style>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js"></script>
 </head>
 <body>
 <header>
@@ -455,20 +458,37 @@ nav a{
 </div>
 
 <script>
-// Initialize data from localStorage
-function initializeData() {
-    if (!localStorage.getItem('activities')) {
-        localStorage.setItem('activities', JSON.stringify([]));
+// Global variables
+let database;
+
+// Wait for Firebase SDK to load
+function initializeApp() {
+    if (typeof firebase === 'undefined') {
+        setTimeout(initializeApp, 100);
+        return;
     }
-    if (!localStorage.getItem('inquiries')) {
-        localStorage.setItem('inquiries', JSON.stringify([]));
-    }
+
+// Firebase Configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBqfXwkM3BSJfJN5SQuQg2SxlXbLDJP2Cw",
+  authDomain: "municipal-accountant.firebaseapp.com",
+  databaseURL: "https://municipal-accountant-default-rtdb.firebaseio.com",
+  projectId: "municipal-accountant",
+  storageBucket: "municipal-accountant.firebasestorage.app",
+  messagingSenderId: "976763117968",
+  appId: "1:976763117968:web:72d44e19053923fe3c9315",
+  measurementId: "G-CVHBGLR1WZ"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+database = firebase.database();
+updateFrontendActivities();
 }
 
 // Show Admin Dashboard
 function showAdminDashboard(event) {
     event.preventDefault();
-    initializeData();
     loadActivities();
     loadInquiries();
     document.getElementById('adminModal').classList.remove('hidden');
@@ -494,138 +514,161 @@ function closeActivityModal() {
     document.getElementById('activityModal').classList.add('hidden');
 }
 
-// Save Activity
+// Save Activity to Firebase
 function saveActivity(event) {
     event.preventDefault();
-    initializeData();
     
-    const activities = JSON.parse(localStorage.getItem('activities'));
-    const id = document.getElementById('activityId').value;
+    const id = document.getElementById('activityId').value || Date.now().toString();
     const title = document.getElementById('activityTitle').value;
     const description = document.getElementById('activityDescription').value;
     const image = document.getElementById('activityImage').value || 'https://images.unsplash.com/photo-1552664730-d307ca884978';
     
-    if (id) {
-        // Edit existing activity
-        const index = activities.findIndex(a => a.id === id);
-        if (index !== -1) {
-            activities[index] = { id, title, description, image };
-        }
-    } else {
-        // Add new activity
-        const newActivity = {
-            id: Date.now().toString(),
-            title,
-            description,
-            image
-        };
-        activities.push(newActivity);
-    }
-    
-    localStorage.setItem('activities', JSON.stringify(activities));
-    closeActivityModal();
-    loadActivities();
-    updateFrontendActivities();
+    database.ref('activities/' + id).set({
+        id,
+        title,
+        description,
+        image,
+        timestamp: new Date().toISOString()
+    }).then(() => {
+        closeActivityModal();
+        loadActivities();
+        updateFrontendActivities();
+    }).catch(error => alert('Error saving activity: ' + error.message));
 }
 
 // Load Activities in Admin Dashboard
 function loadActivities() {
-    initializeData();
-    const activities = JSON.parse(localStorage.getItem('activities'));
-    const list = document.getElementById('activitiesList');
-    
-    if (activities.length === 0) {
-        list.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999;">No activities yet. Click "Add New Activity" to create one.</p>';
+    if (!database) {
+        setTimeout(loadActivities, 100);
         return;
     }
+    const list = document.getElementById('activitiesList');
+    list.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999;">Loading...</p>';
     
-    list.innerHTML = activities.map(activity => `
-        <div class="admin-activity-card">
-            <h4>${activity.title}</h4>
-            <p>${activity.description}</p>
-            <div class="action-buttons">
-                <button class="edit-btn" onclick="editActivity('${activity.id}')">Edit</button>
-                <button class="delete-btn" onclick="deleteActivity('${activity.id}')">Delete</button>
+    database.ref('activities').on('value', (snapshot) => {
+        const data = snapshot.val();
+        const activities = data ? Object.values(data) : [];
+        
+        if (activities.length === 0) {
+            list.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999;">No activities yet. Click "Add New Activity" to create one.</p>';
+            return;
+        }
+        
+        list.innerHTML = activities.map(activity => `
+            <div class="admin-activity-card">
+                <h4>${activity.title}</h4>
+                <p>${activity.description}</p>
+                <div class="action-buttons">
+                    <button class="edit-btn" onclick="editActivity('${activity.id}')">Edit</button>
+                    <button class="delete-btn" onclick="deleteActivity('${activity.id}')">Delete</button>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `).join('');
+    });
 }
 
 // Edit Activity
 function editActivity(id) {
-    initializeData();
-    const activities = JSON.parse(localStorage.getItem('activities'));
-    const activity = activities.find(a => a.id === id);
-    
-    if (activity) {
-        document.getElementById('activityId').value = activity.id;
-        document.getElementById('activityTitle').value = activity.title;
-        document.getElementById('activityDescription').value = activity.description;
-        document.getElementById('activityImage').value = activity.image;
-        document.getElementById('activityModalTitle').textContent = 'Edit Activity';
-        document.getElementById('activityModal').classList.remove('hidden');
-    }
+    database.ref('activities/' + id).once('value', (snapshot) => {
+        const activity = snapshot.val();
+        if (activity) {
+            document.getElementById('activityId').value = activity.id;
+            document.getElementById('activityTitle').value = activity.title;
+            document.getElementById('activityDescription').value = activity.description;
+            document.getElementById('activityImage').value = activity.image;
+            document.getElementById('activityModalTitle').textContent = 'Edit Activity';
+            document.getElementById('activityModal').classList.remove('hidden');
+        }
+    });
 }
 
 // Delete Activity
 function deleteActivity(id) {
     if (confirm('Are you sure you want to delete this activity?')) {
-        initializeData();
-        let activities = JSON.parse(localStorage.getItem('activities'));
-        activities = activities.filter(a => a.id !== id);
-        localStorage.setItem('activities', JSON.stringify(activities));
-        loadActivities();
-        updateFrontendActivities();
+        database.ref('activities/' + id).remove()
+            .then(() => {
+                loadActivities();
+                updateFrontendActivities();
+            })
+            .catch(error => alert('Error deleting activity: ' + error.message));
     }
 }
 
 // Load Inquiries in Admin Dashboard
 function loadInquiries() {
-    initializeData();
-    const inquiries = JSON.parse(localStorage.getItem('inquiries'));
     const list = document.getElementById('inquiriesList');
+    list.innerHTML = '<p style="text-align: center; color: #999;">Loading...</p>';
     
-    if (inquiries.length === 0) {
-        list.innerHTML = '<p style="text-align: center; color: #999;">No inquiries yet.</p>';
-        return;
-    }
-    
-    list.innerHTML = inquiries.map((inquiry, index) => `
-        <div class="inquiry-item">
-            <div class="inquiry-header">
-                <span class="inquiry-name">${inquiry.name}</span>
-                <button class="delete-btn" onclick="deleteInquiry(${index})" style="padding: 4px 8px; font-size: 12px;">Delete</button>
+    database.ref('inquiries').on('value', (snapshot) => {
+        const data = snapshot.val();
+        const inquiries = data ? Object.values(data) : [];
+        
+        if (inquiries.length === 0) {
+            list.innerHTML = '<p style="text-align: center; color: #999;">No inquiries yet.</p>';
+            return;
+        }
+        
+        list.innerHTML = inquiries.map((inquiry, index) => `
+            <div class="inquiry-item">
+                <div class="inquiry-header">
+                    <span class="inquiry-name">${inquiry.name}</span>
+                    <button class="delete-btn" onclick="deleteInquiry('${inquiry.id}')" style="padding: 4px 8px; font-size: 12px;">Delete</button>
+                </div>
+                <div class="inquiry-email">${inquiry.email}</div>
+                <div class="inquiry-subject"><strong>Subject:</strong> ${inquiry.subject}</div>
+                <div class="inquiry-message"><strong>Message:</strong> ${inquiry.message}</div>
+                <div class="inquiry-date">Received: ${new Date(inquiry.date).toLocaleString()}</div>
             </div>
-            <div class="inquiry-email">${inquiry.email}</div>
-            <div class="inquiry-subject"><strong>Subject:</strong> ${inquiry.subject}</div>
-            <div class="inquiry-message"><strong>Message:</strong> ${inquiry.message}</div>
-            <div class="inquiry-date">Received: ${new Date(inquiry.date).toLocaleString()}</div>
-        </div>
-    `).join('');
+        `).join('');
+    });
 }
 
 // Delete Inquiry
-function deleteInquiry(index) {
+function deleteInquiry(id) {
     if (confirm('Delete this inquiry?')) {
-        initializeData();
-        let inquiries = JSON.parse(localStorage.getItem('inquiries'));
-        inquiries.splice(index, 1);
-        localStorage.setItem('inquiries', JSON.stringify(inquiries));
-        loadInquiries();
+        database.ref('inquiries/' + id).remove()
+            .catch(error => alert('Error deleting inquiry: ' + error.message));
     }
+}
+
+// Update Frontend Activities Display
+function updateFrontendActivities() {
+    const activitiesContainer = document.querySelector('.activities');
+    
+    database.ref('activities').on('value', (snapshot) => {
+        const data = snapshot.val();
+        const activities = data ? Object.values(data) : [];
+        
+        if (activitiesContainer) {
+            if (activities.length === 0) {
+                activitiesContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999;">No activities posted yet.</p>';
+            } else {
+                activitiesContainer.innerHTML = activities.map(activity => `
+                    <div class="card">
+                        <img src="${activity.image}" alt="${activity.title}">
+                        <div class="card-content">
+                            <h3>${activity.title}</h3>
+                            <p>${activity.description}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+    });
 }
 
 // Handle Inquiry Form Submission
 document.addEventListener('DOMContentLoaded', function() {
-    initializeData();
-    updateFrontendActivities();
+    initializeApp();
     
     const inquiryForm = document.getElementById('inquiryForm');
     if (inquiryForm) {
         inquiryForm.addEventListener('submit', function(event) {
             event.preventDefault();
             
+            const inquiryId = Date.now().toString();
             const inquiry = {
+                id: inquiryId,
                 name: document.getElementById('inquiryName').value,
                 email: document.getElementById('inquiryEmail').value,
                 subject: document.getElementById('inquirySubject').value,
@@ -633,39 +676,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 date: new Date().toISOString()
             };
             
-            initializeData();
-            let inquiries = JSON.parse(localStorage.getItem('inquiries'));
-            inquiries.push(inquiry);
-            localStorage.setItem('inquiries', JSON.stringify(inquiries));
-            
-            alert('Thank you! Your inquiry has been received. We will get back to you soon.');
-            inquiryForm.reset();
+            database.ref('inquiries/' + inquiryId).set(inquiry)
+                .then(() => {
+                    alert('Thank you! Your inquiry has been received. We will get back to you soon.');
+                    inquiryForm.reset();
+                })
+                .catch(error => alert('Error submitting inquiry: ' + error.message));
         });
     }
 });
-
-// Update Frontend Activities Display
-function updateFrontendActivities() {
-    initializeData();
-    const activities = JSON.parse(localStorage.getItem('activities'));
-    const activitiesContainer = document.querySelector('.activities');
-    
-    if (activitiesContainer) {
-        if (activities.length === 0) {
-            activitiesContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999;">No activities posted yet.</p>';
-        } else {
-            activitiesContainer.innerHTML = activities.map(activity => `
-                <div class="card">
-                    <img src="${activity.image}" alt="${activity.title}">
-                    <div class="card-content">
-                        <h3>${activity.title}</h3>
-                        <p>${activity.description}</p>
-                    </div>
-                </div>
-            `).join('');
-        }
-    }
-}
 
 // Close modals when clicking outside
 window.addEventListener('click', function(event) {
