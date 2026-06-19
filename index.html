@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Office of the Municipal Accountant</title>
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+body{
+    font-family:"Times New Roman", serif;
+    background:#f4f6f9;
+    color:#333;
+}
+header{
+    background:#003366;
+    color:white;
+    padding:20px 50px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+header h1{
+    font-size:28px;
+}
+nav a{
+    color:white;
+    text-decoration:none;
+    margin-left:20px;
+    font-size:18px;
+}
+.hero{
+    background:linear-gradient(rgba(0,51,102,0.7),rgba(0,51,102,0.7)),
+    url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40');
+    background-size:cover;
+    background-position:center;
+    color:white;
+    text-align:center;
+    padding:120px 20px;
+}
+.hero h2{
+    font-size:48px;
+    margin-bottom:15px;
+}
+.hero p{
+    font-size:22px;
+}
+.container{
+    width:90%;
+    max-width:1200px;
+    margin:auto;
+    padding:50px 0;
+}
+.section-title{
+    text-align:center;
+    color:#003366;
+    margin-bottom:30px;
+    font-size:36px;
+}
+.about{
+    background:white;
+    padding:40px;
+    border-radius:10px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.1);
+}
+.activities{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:20px;
+}
+.card{
+    background:white;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 3px 10px rgba(0,0,0,0.1);
+}
+.card img{
+    width:100%;
+    height:220px;
+    object-fit:cover;
+}
+.card-content{
+    padding:20px;
+}
+.card-content h3{
+    color:#003366;
+    margin-bottom:10px;
+}
+.form-container{
+    background:white;
+    padding:40px;
+    border-radius:10px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.1);
+}
+form input,
+form textarea{
+    width:100%;
+    padding:12px;
+    margin-bottom:15px;
+    border:1px solid #ccc;
+    border-radius:5px;
+    font-family:"Times New Roman", serif;
+}
+form button{
+    background:#003366;
+    color:white;
+    border:none;
+    padding:12px 25px;
+    border-radius:5px;
+    cursor:pointer;
+    font-size:18px;
+}
+form button:hover{
+    background:#00509e;
+}
+.contact{
+    text-align:center;
+    line-height:2;
+}
+footer{
+    background:#003366;
+    color:white;
+    text-align:center;
+    padding:20px;
+    margin-top:50px;
+}
+@media(max-width:768px){
+.hero h2{
+    font-size:32px;
+}
+}
+</style>
+</head>
+<body>
+<header>
+    <h1>Office of the Municipal Accountant</h1>
+    <nav>
+        <a href="#about">About</a>
+        <a href="#activities">Activities</a>
+        <a href="#inquiry">Inquiry</a>
+        <a href="#contact">Contact</a>
+    </nav>
+</header>
+<section class="hero">
+    <h2>Transparency, Accountability & Service</h2>
+    <p>Official Website of the Office of the Municipal Accountant</p>
+</section>
+<section class="container" id="about">
+    <h2 class="section-title">About the Office</h2>
+    <div class="about">
+        <p>
+            The Office of the Municipal Accountant is responsible for maintaining
+            financial records, preparing financial statements, ensuring compliance
+            with government accounting standards, and promoting transparency and
+            accountability in public financial management.
+        </p>
+    </div>
+</section>
+<section class="container" id="activities">
+    <h2 class="section-title">Activities & Updates</h2>
+    <div class="activities">
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1521791136064-7986c2920216" alt="">
+            <div class="card-content">
+                <h3>Financial Management Seminar</h3>
+                <p>
+                    Staff attended a financial management seminar to enhance
+                    government accounting practices.
+                </p>
+            </div>
+        </div>
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952" alt="">
+            <div class="card-content">
+                <h3>Budget Review Meeting</h3>
+                <p>
+                    Regular budget review conducted to ensure proper allocation
+                    of municipal funds.
+                </p>
+            </div>
+        </div>
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1552664730-d307ca884978" alt="">
+            <div class="card-content">
+                <h3>COA Compliance Update</h3>
+                <p>
+                    Continuous compliance and reporting initiatives for
+                    accountability and transparency.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="container" id="inquiry">
+    <h2 class="section-title">Message & Inquiries</h2>
+    <div class="form-container">
+        <form>
+            <input type="text" placeholder="Full Name" required>
+            <input type="email" placeholder="Email Address" required>
+            <input type="text" placeholder="Subject" required>
+            <textarea rows="6" placeholder="Type your inquiry here..." required></textarea>
+            <button type="submit">Send Inquiry</button>
+        </form>
+    </div>
+</section>
+<section class="container" id="contact">
+    <h2 class="section-title">Contact Information</h2>
+    <div class="contact">
+        <p><strong>Office of the Municipal Accountant</strong></p>
+        <p>Municipal Hall Building</p>
+        <p>Municipality of [Your Municipality]</p>
+        <p>Email: accountant@municipality.gov.ph</p>
+        <p>Phone: (044) 123-4567</p>
+    </div>
+</section>
+<footer>
+    <p>© 2026 Office of the Municipal Accountant. All Rights Reserved.</p>
+</footer>
+</body>
+</html>
