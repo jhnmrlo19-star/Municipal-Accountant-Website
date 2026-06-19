@@ -25,7 +25,14 @@
 
     document.title = c.site.title;
     setText("logoText", c.site.title);
-    setText("logoIcon", c.site.logoText);
+
+    const logoImg = document.getElementById("logoImg");
+    if (logoImg && c.site.logoImage) {
+      logoImg.src = c.site.logoImage;
+      logoImg.alt = c.site.title;
+    } else if (logoImg) {
+      logoImg.style.display = "none";
+    }
     setText("heroTagline", c.site.tagline);
     setText("heroSubtitle", c.site.subtitle);
     setText("footerText", c.site.footerText);
