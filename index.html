@@ -322,8 +322,22 @@ nav a{
 }
 </style>
 <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { getDatabase } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+
+window.firebaseApp = initializeApp({
+  apiKey: "AIzaSyBqfXwkM3BSJfJN5SQuQg2SxlXbLDJP2Cw",
+  authDomain: "municipal-accountant.firebaseapp.com",
+  databaseURL: "https://municipal-accountant-default-rtdb.firebaseio.com",
+  projectId: "municipal-accountant",
+  storageBucket: "municipal-accountant.firebasestorage.app",
+  messagingSenderId: "976763117968",
+  appId: "1:976763117968:web:72d44e19053923fe3c9315"
+});
+
+window.database = getDatabase(window.firebaseApp);
+</script>
 </head>
 <body>
 <header>
@@ -459,7 +473,8 @@ nav a{
 
 <script>
 // Global variables
-let database;
+import { ref, set, get, onValue, remove } 
+from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
 
 // Wait for Firebase SDK to load
 function initializeApp() {
@@ -532,7 +547,9 @@ function saveActivity(event) {
     const description = document.getElementById('activityDescription').value;
     const image = document.getElementById('activityImage').value || 'https://images.unsplash.com/photo-1552664730-d307ca884978';
     
-    database.ref('activities/' + id).set({
+    import { ref, set } from "firebase/database";
+
+set(ref(database, 'activities/' + id), {
         id,
         title,
         description,
