@@ -31,7 +31,8 @@ const SITE_CONFIG = {
     shortTitle: "Municipal Accountant",
     tagline: "Transparency, Accountability & Service",
     subtitle: "Official Website of the Office of the Municipal Accountant",
-    logoText: "MA",
+    logoText: "MA", // Fallback if logoImage is empty
+    logoImage: "images/logo.png", // Path to your logo file
     footerText: "© 2026 Office of the Municipal Accountant. All Rights Reserved.",
     heroImage: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1600&q=80",
   },
