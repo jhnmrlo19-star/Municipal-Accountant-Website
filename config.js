@@ -56,7 +56,7 @@ in public financial management.`,
     email: "sdne.maiaso@gmail.com",
     phone: "09*********",
     hours: "Monday – Friday, 8:00 AM – 5:00 PM",
-    mapEmbed: "", // https://maps.app.goo.gl/guzSZdkYes3B28En8
+    mapEmbed: "https://maps.app.goo.gl/guSZdkYes3B28En", // Put Google Maps
   },
 
   // ── Navigation Links ───────────────────────────────────────
