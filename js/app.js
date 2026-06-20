@@ -165,49 +165,7 @@
           renderPosts();
           updatePostCount();
         });
-      }<script>
-let reactions = {
-  like: 0,
-  love: 0,
-  celebrate: 0
-};
-
-function addReaction(type) {
-  reactions[type]++;
-
-  document.getElementById("likeCount").textContent =
-    reactions.like;
-
-  document.getElementById("loveCount").textContent =
-    reactions.love;
-
-  document.getElementById("celebrateCount").textContent =
-    reactions.celebrate;
-}
-
-function addComment() {
-  const name = document.getElementById("commentName").value.trim();
-  const text = document.getElementById("commentText").value.trim();
-
-  if (!name || !text) {
-    alert("Please enter your name and comment.");
-    return;
-  }
-
-  const comment = document.createElement("div");
-  comment.className = "comment-item";
-
-  comment.innerHTML = `
-    <div class="comment-author">${name}</div>
-    <div>${text}</div>
-  `;
-
-  document.getElementById("commentsList").prepend(comment);
-
-  document.getElementById("commentName").value = "";
-  document.getElementById("commentText").value = "";
-}
-</script>
+      }
     });
   }
 
