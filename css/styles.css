@@ -571,65 +571,6 @@ button {
 .post-card:hover .post-read-more {
   gap: 10px;
 }
-.post-reactions,
-.post-comments {
-  margin-top: 20px;
-  padding-top: 15px;
-  border-top: 1px solid #ddd;
-}
-
-.reaction-buttons {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.reaction-buttons button {
-  padding: 8px 15px;
-  border: none;
-  background: #f0f0f0;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.reaction-buttons button:hover {
-  background: #dbeafe;
-}
-
-.comment-form {
-  margin-top: 15px;
-}
-
-.comment-form input,
-.comment-form textarea {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-.comment-form button {
-  background: #2563eb;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.comment-item {
-  background: #f8fafc;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 6px;
-}
-
-.comment-author {
-  font-weight: bold;
-  margin-bottom: 5px;
-}
 
 .empty-state {
   grid-column: 1 / -1;
