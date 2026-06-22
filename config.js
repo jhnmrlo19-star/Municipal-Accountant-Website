@@ -94,7 +94,7 @@ in public financial management.`,
       icon: "🏥",
       title: "PhilHealth Application and Payment",
       description: "Assistance for PhilHealth member registration, updating, and payment guidance for eligible clients.",
-      details: "Applicants may prepare the following before visiting the office. Additional documents may be requested depending on membership type, declared dependents, or record updates.",
+      details: "Applicants may prepare the following before visiting the office. Additional documents may be requested depending on membership type, declared dependents, or record updates. Ps. Our Process here takes 2 to 3 weeks. We will contact you when your ID and MDR where here.",
       requirements: [
         "Properly accomplished PhilHealth Member Registration Form (PMRF).",
         "Valid proof of identity for first-time registrants.",
