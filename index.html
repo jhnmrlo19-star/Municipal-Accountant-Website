@@ -186,12 +186,31 @@
       <button class="modal-close" aria-label="Close">&times;</button>
     </div>
     <div class="modal-body">
-      <img class="post-detail-image" id="postDetailImage" src="" alt="">
+      <div class="post-detail-media" id="postDetailMedia"></div>
       <div class="post-detail-meta">
         <span class="post-category" id="postDetailCategory"></span>
         <span class="post-date" id="postDetailDate"></span>
       </div>
+      <div class="post-detail-reactions" id="postDetailReactions"></div>
       <div class="post-detail-content" id="postDetailContent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Service Detail Modal -->
+<div id="serviceDetailModal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <span class="admin-kicker">Service Requirements</span>
+        <h2 id="serviceDetailTitle">Service</h2>
+      </div>
+      <button class="modal-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p class="service-detail-desc" id="serviceDetailDesc"></p>
+      <ul class="requirements-list" id="serviceRequirementsList"></ul>
+      <p class="service-detail-note" id="serviceDetailNote"></p>
     </div>
   </div>
 </div>
@@ -200,8 +219,14 @@
 <div id="adminModal" class="modal-overlay hidden">
   <div class="modal modal-lg">
     <div class="modal-header">
-      <h2>Admin Dashboard</h2>
-      <button class="modal-close" aria-label="Close">&times;</button>
+      <div>
+        <span class="admin-kicker">Admin View</span>
+        <h2>Admin Dashboard</h2>
+      </div>
+      <div class="modal-header-actions">
+        <button class="btn-sm btn-logout" id="adminLogoutBtn" type="button">Logout</button>
+        <button class="modal-close" aria-label="Close">&times;</button>
+      </div>
     </div>
     <div class="admin-tabs">
       <button class="admin-tab active" data-tab="posts">Posts & Updates</button>
@@ -250,6 +275,28 @@
   </div>
 </div>
 
+<!-- Admin Login Modal -->
+<div id="adminLoginModal" class="modal-overlay hidden">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div>
+        <span class="admin-kicker">Private Access</span>
+        <h2>Admin Login</h2>
+      </div>
+      <button class="modal-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="adminLoginForm">
+        <div class="form-group">
+          <label for="adminPassword">Password</label>
+          <input type="password" id="adminPassword" placeholder="Enter admin password" autocomplete="current-password" required>
+        </div>
+        <button type="submit" class="form-submit">Login to Admin View</button>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- Add/Edit Post Modal -->
 <div id="postFormModal" class="modal-overlay hidden">
   <div class="modal">
@@ -281,9 +328,17 @@
           <textarea id="postFullContent" rows="5" placeholder="Complete details shown when clicking Read More"></textarea>
         </div>
         <div class="form-group">
-  <label for="postImage">Image URL (optional)</label>
-  <input type="url" id="postImage" placeholder="https://example.com/image.jpg">
-</div>
+          <label for="postImage">Image URL (optional)</label>
+          <input type="url" id="postImage" placeholder="https://example.com/image.jpg">
+        </div>
+        <div class="form-group">
+          <label for="postVideo">Video URL (optional)</label>
+          <input type="url" id="postVideo" placeholder="https://example.com/video.mp4">
+        </div>
+        <div class="form-group">
+          <label for="postMediaFile">Upload Image, Video, PDF, Word or Excel (optional)</label>
+          <input type="file" id="postMediaFile" accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx">
+          <p class="field-hint">Videos can be up to 50 MB. Images and documents can be up to 20 MB.</p>
         </div>
         <button type="submit" class="form-submit">Save Post</button>
       </form>

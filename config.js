@@ -51,12 +51,12 @@ in public financial management.`,
   // ── Contact Information ────────────────────────────────────
   contact: {
     officeName: "Office of the Municipal Accountant",
-    address: "Barangay Sagaba Municipal Hall Building",
-    city: "Santo Domingo, Nueva Ecija",
+    address: "Santo Domingo Municipal Hall Building",
+    city: "Municipality of Santo Domingo, Nueva Ecija",
     email: "sdne.maiaso@gmail.com",
-    phone: "09*********",
+    phone: "(044) 123-4567",
     hours: "Monday – Friday, 8:00 AM – 5:00 PM",
-    mapEmbed: "https://maps.app.goo.gl/guSZdkYes3B28En", // Put Google Maps
+    mapEmbed: "", // Optional: paste Google Maps embed URL here
   },
 
   // ── Navigation Links ───────────────────────────────────────
@@ -89,6 +89,21 @@ in public financial management.`,
       icon: "📋",
       title: "Compliance & Transparency",
       description: "Ensuring adherence to government accounting rules and promoting public accountability.",
+    },
+    {
+      icon: "🏥",
+      title: "PhilHealth Application and Payment",
+      description: "Assistance for PhilHealth member registration, updating, and payment guidance for eligible clients.",
+      details: "Applicants may prepare the following before visiting the office. Additional documents may be requested depending on membership type, declared dependents, or record updates.",
+      requirements: [
+        "Properly accomplished PhilHealth Member Registration Form (PMRF).",
+        "Valid proof of identity for first-time registrants.",
+        "PhilHealth Identification Number (PIN), if already registered.",
+        "Supporting documents for declared dependents, when applicable.",
+        "Proof of income for self-earning individuals, kasambahays, family drivers, and other direct contributors when required.",
+        "Payment amount or contribution reference based on the applicable PhilHealth contribution schedule.",
+      ],
+      note: "Please bring original documents and clear photocopies when available.",
     },
   ],
 
