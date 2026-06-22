@@ -10,9 +10,23 @@
   let postsCache = [];
   let currentFilter = "all";
   let editingPostId = null;
+  let isAdminSession = false;
+  const ADMIN_SESSION_KEY = "omaAdminSession";
+  const REACTIONS = [
+    { key: "like", label: "Like", icon: "👍" },
+    { key: "heart", label: "Heart", icon: "❤️" },
+    { key: "wow", label: "Wow", icon: "😮" },
+    { key: "celebrate", label: "Celebrate", icon: "🎉" },
+  ];
+  const FILE_LIMITS_MB = {
+    image: 20,
+    video: 50,
+    document: 20,
+  };
 
   // ── Initialize ─────────────────────────────────────────────
   function init() {
+    isAdminSession = getStoredAdminSession();
     applySiteConfig();
     initFirebase();
     bindEvents();
@@ -61,7 +75,7 @@
 
     nav.innerHTML = links
       .map((l) => `<a href="${l.href}">${l.label}</a>`)
-      .join("") + `<a href="#" class="admin-btn" id="adminBtn">Admin</a>`;
+      .join("") + `<a href="#admin" class="admin-btn" id="adminBtn">${isAdminSession ? "Admin View" : "Admin Login"}</a>`;
   }
 
   function renderServices(services) {
@@ -70,14 +84,33 @@
 
     grid.innerHTML = services
       .map(
-        (s) => `
+        (s, index) => `
       <div class="service-card reveal">
         <div class="service-icon">${s.icon}</div>
         <h3>${escapeHtml(s.title)}</h3>
         <p>${escapeHtml(s.description)}</p>
+        ${s.requirements ? `<button class="service-details-btn" type="button" onclick="App.openServiceDetails(${index})">View requirements</button>` : ""}
       </div>`
       )
       .join("");
+  }
+
+  function openServiceDetails(index) {
+    const service = SITE_CONFIG.services[index];
+    if (!service || !service.requirements) return;
+
+    setText("serviceDetailTitle", service.title);
+    setText("serviceDetailDesc", service.details || service.description);
+    setText("serviceDetailNote", service.note || "");
+
+    const list = document.getElementById("serviceRequirementsList");
+    if (list) {
+      list.innerHTML = service.requirements
+        .map((item) => `<li>${escapeHtml(item)}</li>`)
+        .join("");
+    }
+
+    openModal("serviceDetailModal");
   }
 
   function renderContact(contact) {
@@ -158,6 +191,11 @@
                   fullContent: a.description,
                   category: "Activity",
                   image: a.image || SITE_CONFIG.defaultPostImage,
+                  mediaType: "image",
+                  mediaUrl: a.image || SITE_CONFIG.defaultPostImage,
+                  fileName: "",
+                  fileMimeType: "",
+                  reactions: defaultReactions(),
                   timestamp: a.timestamp || new Date().toISOString(),
                 }))
                 .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
@@ -189,11 +227,11 @@
 
     grid.innerHTML = filtered
       .map(
-        (post) => `
+        (post) => {
+          const media = getPostMedia(post);
+          return `
       <article class="post-card reveal" data-id="${post.id}" onclick="App.openPost('${post.id}')">
-        <div class="post-image-wrap">
-          <img class="post-image" src="${escapeHtml(post.image)}" alt="${escapeHtml(post.title)}" loading="lazy">
-        </div>
+        ${renderPostMedia(media, post.title)}
         <div class="post-body">
           <div class="post-meta">
             <span class="post-category">${escapeHtml(post.category || "Update")}</span>
@@ -201,9 +239,11 @@
           </div>
           <h3>${escapeHtml(post.title)}</h3>
           <p>${escapeHtml(post.description)}</p>
+          ${renderReactions(post)}
           <span class="post-read-more">Read more →</span>
         </div>
-      </article>`
+      </article>`;
+        }
       )
       .join("");
 
@@ -219,33 +259,55 @@
     const post = postsCache.find((p) => p.id === id);
     if (!post) return;
 
-    document.getElementById("postDetailImage").src = post.image;
-    document.getElementById("postDetailImage").alt = post.title;
+    const mediaEl = document.getElementById("postDetailMedia");
+    if (mediaEl) {
+      mediaEl.innerHTML = renderPostMedia(getPostMedia(post), post.title, true);
+    }
     document.getElementById("postDetailCategory").textContent = post.category || "Update";
     document.getElementById("postDetailDate").textContent = formatDate(post.timestamp);
     document.getElementById("postDetailTitle").textContent = post.title;
     document.getElementById("postDetailContent").textContent = post.fullContent || post.description;
+    const reactionsEl = document.getElementById("postDetailReactions");
+    if (reactionsEl) reactionsEl.innerHTML = renderReactions(post, true);
 
     openModal("postDetailModal");
   }
 
-  function savePost(e) {
+  async function savePost(e) {
     e.preventDefault();
+    if (!requireAdmin()) return;
     if (!db) return showToast("Database not connected.", "error");
 
     const id = editingPostId || Date.now().toString();
+    const existingPost = editingPostId
+      ? postsCache.find((p) => p.id === editingPostId)
+      : null;
+    let uploadedMedia = null;
+
+    try {
+      uploadedMedia = await readSelectedMedia();
+    } catch (err) {
+      showToast(err.message, "error");
+      return;
+    }
+
+    const media = resolvePostMedia(uploadedMedia, existingPost);
     const post = {
       id,
       title: document.getElementById("postTitle").value.trim(),
       description: document.getElementById("postDescription").value.trim(),
       fullContent: document.getElementById("postFullContent").value.trim(),
       category: document.getElementById("postCategory").value,
-      image:
-        document.getElementById("postImage").value.trim() ||
-        SITE_CONFIG.defaultPostImage,
+      image: media.type === "image" ? media.url : SITE_CONFIG.defaultPostImage,
+      video: media.type === "video" ? media.url : "",
+      document: media.type === "document" ? media.url : "",
+      mediaType: media.type,
+      mediaUrl: media.url,
+      fileName: media.fileName || "",
+      fileMimeType: media.mimeType || "",
+      reactions: existingPost?.reactions || defaultReactions(),
       timestamp: editingPostId
-        ? postsCache.find((p) => p.id === editingPostId)?.timestamp ||
-          new Date().toISOString()
+        ? existingPost?.timestamp || new Date().toISOString()
         : new Date().toISOString(),
     };
 
@@ -261,6 +323,8 @@
   }
 
   function editPost(id) {
+    if (!requireAdmin()) return;
+
     const post = postsCache.find((p) => p.id === id);
     if (!post) return;
 
@@ -271,12 +335,20 @@
     document.getElementById("postFullContent").value = post.fullContent || "";
     document.getElementById("postCategory").value = post.category || "Update";
     document.getElementById("postImage").value =
-      post.image === SITE_CONFIG.defaultPostImage ? "" : post.image;
+      post.mediaType !== "video" && post.image && post.image !== SITE_CONFIG.defaultPostImage && !isDataUrl(post.image)
+        ? post.image
+        : "";
+    document.getElementById("postVideo").value =
+      post.mediaType === "video" && post.video && !isDataUrl(post.video)
+        ? post.video
+        : "";
 
     openModal("postFormModal");
   }
 
   function deletePost(id) {
+    if (!requireAdmin()) return;
+
     if (!confirm("Delete this post permanently?")) return;
 
     dbRef("posts/" + id)
@@ -285,10 +357,202 @@
       .catch((err) => showToast("Error: " + err.message, "error"));
   }
 
+  function clearPostReactions(id) {
+    if (!requireAdmin()) return;
+
+    const post = postsCache.find((p) => p.id === id);
+    if (!post) return;
+
+    if (!confirm(`Clear all reactions for "${post.title}"?`)) return;
+
+    dbRef("posts/" + id + "/reactions")
+      .set(defaultReactions())
+      .then(() => showToast("Post reactions cleared.", "success"))
+      .catch((err) => showToast("Error: " + err.message, "error"));
+  }
+
   function resetPostForm() {
     editingPostId = null;
     document.getElementById("postFormTitle").textContent = "Add New Post";
     document.getElementById("postForm").reset();
+  }
+
+  function reactToPost(id, reactionKey, event) {
+    event?.stopPropagation();
+    if (!db) return showToast("Database not connected.", "error");
+    if (!REACTIONS.some((reaction) => reaction.key === reactionKey)) return;
+
+    dbRef(`posts/${id}/reactions/${reactionKey}`)
+      .transaction((count) => (count || 0) + 1)
+      .catch((err) => showToast("Reaction failed: " + err.message, "error"));
+  }
+
+  function defaultReactions() {
+    return REACTIONS.reduce((counts, reaction) => {
+      counts[reaction.key] = 0;
+      return counts;
+    }, {});
+  }
+
+  function renderReactions(post, isDetail) {
+    const counts = { ...defaultReactions(), ...(post.reactions || {}) };
+    const extraClass = isDetail ? " is-detail" : "";
+
+    return `
+      <div class="post-reactions${extraClass}">
+        ${REACTIONS.map(
+          (reaction) => `
+          <button class="reaction-btn" type="button" aria-label="${reaction.label}" onclick="App.reactToPost('${post.id}', '${reaction.key}', event)">
+            <span class="reaction-icon">${reaction.icon}</span>
+            <span class="reaction-count">${counts[reaction.key] || 0}</span>
+          </button>`
+        ).join("")}
+      </div>`;
+  }
+
+  function getPostMedia(post) {
+    if (post.mediaType === "video" && (post.mediaUrl || post.video)) {
+      return { type: "video", url: post.mediaUrl || post.video };
+    }
+
+    if (post.mediaType === "document" && (post.mediaUrl || post.document)) {
+      return {
+        type: "document",
+        url: post.mediaUrl || post.document,
+        fileName: post.fileName || "Attached document",
+        mimeType: post.fileMimeType || "",
+      };
+    }
+
+    if (post.video) {
+      return { type: "video", url: post.video };
+    }
+
+    return {
+      type: "image",
+      url: post.mediaUrl || post.image || SITE_CONFIG.defaultPostImage,
+    };
+  }
+
+  function renderPostMedia(media, title, isDetail) {
+    const safeUrl = escapeHtml(media.url || SITE_CONFIG.defaultPostImage);
+    const safeTitle = escapeHtml(title || "Post media");
+    const detailClass = isDetail ? " post-media-detail" : "";
+
+    if (media.type === "video") {
+      return `
+        <div class="post-image-wrap post-video-wrap${detailClass}">
+          <video class="post-video" src="${safeUrl}" muted loop autoplay playsinline preload="metadata" ${isDetail ? "controls" : ""}></video>
+          <span class="media-badge">Video</span>
+        </div>`;
+    }
+
+    if (media.type === "document") {
+      const fileName = escapeHtml(media.fileName || "Attached document");
+      const fileKind = getDocumentLabel(media.fileName, media.mimeType);
+      return `
+        <div class="post-document-wrap${detailClass}">
+          <div class="document-icon">${fileKind.icon}</div>
+          <div class="document-info">
+            <span class="document-label">${fileKind.label}</span>
+            <strong>${fileName}</strong>
+            <a href="${safeUrl}" download="${fileName}" onclick="event.stopPropagation()">Download file</a>
+          </div>
+        </div>`;
+    }
+
+    return `
+      <div class="post-image-wrap${detailClass}">
+        <img class="post-image" src="${safeUrl}" alt="${safeTitle}" loading="lazy">
+      </div>`;
+  }
+
+  function resolvePostMedia(uploadedMedia, existingPost) {
+    const imageUrl = document.getElementById("postImage").value.trim();
+    const videoUrl = document.getElementById("postVideo").value.trim();
+
+    if (uploadedMedia) return uploadedMedia;
+    if (videoUrl) return { type: "video", url: videoUrl };
+    if (imageUrl) return { type: "image", url: imageUrl };
+    if (existingPost) return getPostMedia(existingPost);
+
+    return { type: "image", url: SITE_CONFIG.defaultPostImage };
+  }
+
+  function getDocumentLabel(fileName, mimeType) {
+    const name = (fileName || "").toLowerCase();
+    const mime = (mimeType || "").toLowerCase();
+
+    if (name.endsWith(".pdf") || mime.includes("pdf")) {
+      return { icon: "PDF", label: "PDF File" };
+    }
+
+    if (name.endsWith(".doc") || name.endsWith(".docx") || mime.includes("word")) {
+      return { icon: "DOC", label: "Word File" };
+    }
+
+    if (name.endsWith(".xls") || name.endsWith(".xlsx") || mime.includes("excel") || mime.includes("spreadsheet")) {
+      return { icon: "XLS", label: "Excel File" };
+    }
+
+    return { icon: "FILE", label: "Document" };
+  }
+
+  function readSelectedMedia() {
+    const input = document.getElementById("postMediaFile");
+    const file = input?.files?.[0];
+    if (!file) return Promise.resolve(null);
+
+    const fileType = getUploadType(file);
+    if (!fileType) {
+      return Promise.reject(new Error("Please choose an image, video, PDF, Word or Excel file."));
+    }
+
+    const limitMb = FILE_LIMITS_MB[fileType];
+    if (file.size > limitMb * 1024 * 1024) {
+      return Promise.reject(new Error(`Please choose a ${fileType} file under ${limitMb} MB.`));
+    }
+
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () =>
+        resolve({
+          type: fileType,
+          url: reader.result,
+          fileName: file.name,
+          mimeType: file.type,
+        });
+      reader.onerror = () => reject(new Error("Could not read the selected file."));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function getUploadType(file) {
+    const name = file.name.toLowerCase();
+    const mime = (file.type || "").toLowerCase();
+    const documentExtensions = [".pdf", ".doc", ".docx", ".xls", ".xlsx"];
+    const documentMimes = [
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ];
+
+    if (mime.startsWith("image/")) return "image";
+    if (mime.startsWith("video/")) return "video";
+    if (
+      documentExtensions.some((extension) => name.endsWith(extension)) ||
+      documentMimes.includes(mime)
+    ) {
+      return "document";
+    }
+
+    return "";
+  }
+
+  function isDataUrl(value) {
+    return typeof value === "string" && value.startsWith("data:");
   }
 
   function renderAdminPosts() {
@@ -311,6 +575,7 @@
         </div>
         <div class="admin-actions">
           <button class="btn-sm btn-edit" onclick="App.editPost('${post.id}')">Edit</button>
+          <button class="btn-sm btn-clear" onclick="App.clearPostReactions('${post.id}')">Clear reactions</button>
           <button class="btn-sm btn-delete" onclick="App.deletePost('${post.id}')">Delete</button>
         </div>
       </div>`
@@ -395,6 +660,8 @@
   }
 
   function deleteInquiry(id) {
+    if (!requireAdmin()) return;
+
     if (!confirm("Delete this inquiry?")) return;
 
     dbRef("inquiries/" + id)
@@ -405,16 +672,75 @@
 
   // ── Admin ──────────────────────────────────────────────────
   function openAdmin() {
-    const password = prompt("Enter Admin Password:");
+    if (!isAdminSession) {
+      openAdminLogin();
+      return;
+    }
+
+    openAdminDashboard();
+  }
+
+  function openAdminLogin() {
+    document.getElementById("adminLoginForm")?.reset();
+    openModal("adminLoginModal");
+    setTimeout(() => document.getElementById("adminPassword")?.focus(), 50);
+  }
+
+  function submitAdminLogin(e) {
+    e.preventDefault();
+
+    const password = document.getElementById("adminPassword").value;
     if (password !== SITE_CONFIG.adminPassword) {
       showToast("Incorrect password.", "error");
       return;
     }
 
+    setAdminSession(true);
+    closeModal("adminLoginModal");
+    showToast("Admin session started.", "success");
+    openAdminDashboard();
+  }
+
+  function openAdminDashboard() {
     renderAdminPosts();
     loadInquiries();
     switchAdminTab("posts");
     openModal("adminModal");
+  }
+
+  function logoutAdmin() {
+    setAdminSession(false);
+    closeModal("adminModal");
+    closeModal("postFormModal");
+    showToast("Logged out of admin view.", "success");
+  }
+
+  function setAdminSession(value) {
+    isAdminSession = value;
+
+    if (value) {
+      localStorage.setItem(ADMIN_SESSION_KEY, "1");
+      document.body.classList.add("admin-session");
+    } else {
+      localStorage.removeItem(ADMIN_SESSION_KEY);
+      document.body.classList.remove("admin-session");
+    }
+
+    const adminBtn = document.getElementById("adminBtn");
+    if (adminBtn) adminBtn.textContent = value ? "Admin View" : "Admin Login";
+  }
+
+  function getStoredAdminSession() {
+    const isStored = localStorage.getItem(ADMIN_SESSION_KEY) === "1";
+    document.body.classList.toggle("admin-session", isStored);
+    return isStored;
+  }
+
+  function requireAdmin() {
+    if (isAdminSession) return true;
+    showToast("Please log in to use admin tools.", "error");
+    openAdminLogin();
+    return false;
   }
 
   function switchAdminTab(tab) {
@@ -522,8 +848,11 @@
 
     document.getElementById("inquiryForm")?.addEventListener("submit", submitInquiry);
     document.getElementById("postForm")?.addEventListener("submit", savePost);
+    document.getElementById("adminLoginForm")?.addEventListener("submit", submitAdminLogin);
+    document.getElementById("adminLogoutBtn")?.addEventListener("click", logoutAdmin);
 
     document.getElementById("addPostBtn")?.addEventListener("click", () => {
+      if (!requireAdmin()) return;
       resetPostForm();
       openModal("postFormModal");
     });
@@ -533,14 +862,22 @@
         document.getElementById("mainNav")?.classList.remove("open");
       });
     });
+
+    if (window.location.hash === "#admin") {
+      openAdmin();
+    }
   }
 
   // ── Public API ─────────────────────────────────────────────
   window.App = {
     openPost,
+    openServiceDetails,
     editPost,
     deletePost,
+    clearPostReactions,
+    reactToPost,
     deleteInquiry,
+    logoutAdmin,
     openModal,
     closeModal,
   };
